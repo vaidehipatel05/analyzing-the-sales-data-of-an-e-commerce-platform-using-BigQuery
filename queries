@@ -1,0 +1,31 @@
+Analytical queries.
+
+1. This query provides a ranked list of SKUs based on their total revenue, helping to identify the most financially successful products in the specified e-commerce dataset.
+
+SELECT sku, SUM(revenue) AS total_revenue
+FROM `fluid-tuner-403501.ecommerce_dataset.ecommerce`
+GROUP BY sku
+ORDER BY total_revenue DESC;
+
+ 
+
+2. This query provides a detailed breakdown of e-commerce sales, showing the total revenue, average unit price, and total quantity sold for each SKU and color combination, with results ordered by total revenue and grouped by sku and color.
+
+SELECT sku, color,
+  SUM(unit_price * quantity) AS total_revenue,
+  AVG(unit_price) AS avg_unit_price,
+  SUM(quantity) AS total_quantity_sold
+FROM `fluid-tuner-403501.ecommerce_dataset.ecommerce`
+GROUP BY sku, color
+ORDER BY total_revenue DESC;
+
+
+3. Made use of efficient compression techniques to optimize performance with partitioning and clustering. Industry level use - it can help reduce storage costs and improve query performance.
+
+CREATE TABLE ecommerce_dataset.sales_data_compressed
+PARTITION BY DATE(order_date)
+CLUSTER BY sku AS
+SELECT order_id, order_date,  sku, color, size, unit_price, quantity, revenue
+FROM `fluid-tuner-403501.ecommerce_dataset.ecommerce`;
+
+This query partitions the table by date and clusters it by SKU, potentially improving compression and query performance.
